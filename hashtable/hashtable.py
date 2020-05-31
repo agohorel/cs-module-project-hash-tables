@@ -21,8 +21,9 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
-
+        self.capacity = capacity;
+        self.storage = [None] * capacity;
+        self.item_count = 0;
 
     def get_num_slots(self):
         """
@@ -34,7 +35,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return len(self.storage)
 
 
     def get_load_factor(self):
@@ -43,7 +44,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.item_count / len(self.storage)
 
 
     def fnv1(self, key):
@@ -53,7 +54,35 @@ class HashTable:
         Implement this, and/or DJB2.
         """
 
-        # Your code here
+        # 64 bit fnv offset = 14695981039346656037 = 0xCBF29CE484222325 
+        hashed = 0xCBF29CE484222325
+        #  64 bit fnv prime = 2^40 + 2^8 + 0xb3 = 1099511628211 = 0x100000001b3 
+        fnv_prime = 0x100000001b3
+
+        for byte in key.encode():
+            hashed *= byte
+            hashed ^= byte
+
+        return hashed
+
+
+    def fnv1a(self, key):
+        """
+        FNV-1a Hash, 64-bit
+
+        Implement this, and/or DJB2.
+        """
+
+        # 64 bit fnv offset = 14695981039346656037 = 0xCBF29CE484222325 
+        hashed = 0xCBF29CE484222325
+        #  64 bit fnv prime = 2^40 + 2^8 + 0xb3 = 1099511628211 = 0x100000001b3 
+        fnv_prime = 0x100000001b3
+
+        for byte in key.encode():
+            hashed ^= byte
+            hashed *= byte
+
+        return hashed
 
 
     def djb2(self, key):
@@ -62,7 +91,14 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+
+        hashed = 5381;
+        
+        for byte in key.encode():
+            hashed = ((hashed << 5) + hashed) + byte
+            # this is an optimized version of: hashed = hashed * 33 + byte
+
+        return hashed
 
 
     def hash_index(self, key):
@@ -70,8 +106,11 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        
+        # return self.djb2(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
+        return self.fnv1a(key) % self.capacity
+
 
     def put(self, key, value):
         """
@@ -81,7 +120,9 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        self.storage[index] = value
+        self.item_count += 1
 
 
     def delete(self, key):
@@ -92,7 +133,13 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+
+        if self.storage[index] == None:
+            print("Value not found in hash table")
+        else:
+            self.storage[index] = None
+            self.item_count -= 1
 
 
     def get(self, key):
@@ -103,7 +150,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        return self.storage[index]
 
 
     def resize(self, new_capacity):
@@ -113,12 +161,12 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
 
 
 
 if __name__ == "__main__":
     ht = HashTable(8)
+
 
     ht.put("line_1", "'Twas brillig, and the slithy toves")
     ht.put("line_2", "Did gyre and gimble in the wabe:")
