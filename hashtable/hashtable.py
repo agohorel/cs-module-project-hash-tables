@@ -119,7 +119,7 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.storage[index] = value
+        self.storage[index] = HashTableEntry(key, value)
         self.item_count += 1
 
     def delete(self, key):
@@ -147,7 +147,11 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        return self.storage[index]
+
+        if self.storage[index] == None:
+            return None
+        else: 
+            return self.storage[index].value
 
     def resize(self, new_capacity):
         """
