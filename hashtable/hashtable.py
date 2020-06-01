@@ -2,6 +2,7 @@ class HashTableEntry:
     """
     Linked List hash table key/value pair
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -21,9 +22,9 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        self.capacity = capacity;
-        self.storage = [None] * capacity;
-        self.item_count = 0;
+        self.capacity = capacity
+        self.storage = [None] * capacity
+        self.item_count = 0
 
     def get_num_slots(self):
         """
@@ -37,7 +38,6 @@ class HashTable:
         """
         return len(self.storage)
 
-
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
@@ -46,7 +46,6 @@ class HashTable:
         """
         return self.item_count / len(self.storage)
 
-
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
@@ -54,17 +53,16 @@ class HashTable:
         Implement this, and/or DJB2.
         """
 
-        # 64 bit fnv offset = 14695981039346656037 = 0xCBF29CE484222325 
+        # 64 bit fnv offset = 14695981039346656037 = 0xCBF29CE484222325
         hashed = 0xCBF29CE484222325
-        #  64 bit fnv prime = 2^40 + 2^8 + 0xb3 = 1099511628211 = 0x100000001b3 
+        #  64 bit fnv prime = 2^40 + 2^8 + 0xb3 = 1099511628211 = 0x100000001b3
         fnv_prime = 0x100000001b3
 
         for byte in key.encode():
-            hashed *= byte
+            hashed *= fnv_prime
             hashed ^= byte
 
         return hashed
-
 
     def fnv1a(self, key):
         """
@@ -73,44 +71,44 @@ class HashTable:
         Implement this, and/or DJB2.
         """
 
-        # 64 bit fnv offset = 14695981039346656037 = 0xCBF29CE484222325 
+        # 64 bit fnv offset = 14695981039346656037 = 0xCBF29CE484222325
         hashed = 0xCBF29CE484222325
-        #  64 bit fnv prime = 2^40 + 2^8 + 0xb3 = 1099511628211 = 0x100000001b3 
+        #  64 bit fnv prime = 2^40 + 2^8 + 0xb3 = 1099511628211 = 0x100000001b3
         fnv_prime = 0x100000001b3
 
         for byte in key.encode():
             hashed ^= byte
-            hashed *= byte
+            hashed *= fnv_prime
 
         return hashed
-
 
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
 
         Implement this, and/or FNV-1.
+
+        Some insight into the magic numbers 5381 and 33: 
+        https://stackoverflow.com/questions/1579721/why-are-5381-and-33-so-important-in-the-djb2-algorithm
         """
 
-        hashed = 5381;
-        
+        hashed = 5381
+
         for byte in key.encode():
             hashed = ((hashed << 5) + hashed) + byte
             # this is an optimized version of: hashed = hashed * 33 + byte
 
         return hashed
 
-
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        
+
         # return self.djb2(key) % self.capacity
         # return self.fnv1(key) % self.capacity
         return self.fnv1a(key) % self.capacity
-
 
     def put(self, key, value):
         """
@@ -123,7 +121,6 @@ class HashTable:
         index = self.hash_index(key)
         self.storage[index] = value
         self.item_count += 1
-
 
     def delete(self, key):
         """
@@ -141,7 +138,6 @@ class HashTable:
             self.storage[index] = None
             self.item_count -= 1
 
-
     def get(self, key):
         """
         Retrieve the value stored with the given key.
@@ -153,7 +149,6 @@ class HashTable:
         index = self.hash_index(key)
         return self.storage[index]
 
-
     def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
@@ -163,10 +158,8 @@ class HashTable:
         """
 
 
-
 if __name__ == "__main__":
     ht = HashTable(8)
-
 
     ht.put("line_1", "'Twas brillig, and the slithy toves")
     ht.put("line_2", "Did gyre and gimble in the wabe:")
