@@ -210,6 +210,27 @@ class HashTable:
 
         Implement this.
         """
+        self.capacity = new_capacity
+        new_array = [LinkedList()] * new_capacity
+
+        # iterate through existing array
+        for slot in self.storage:
+            # grab reference to head from each linked list
+            cur = slot.head
+            # iterate through linked list
+            while cur:
+                # generate a new index (capacity has changed - so will index)
+                index = self.hash_index(cur.key)
+                # check if the current list doesn't have a head, if not add one
+                if new_array[index].head == None:
+                    new_array[index].head = HashTableEntry(cur.key, cur.value)
+                # otherwise add a new node to the list
+                else:
+                    node = HashTableEntry(cur.key, cur.value)
+                    node.next = new_array[index].head
+                    new_array[index].head = node 
+                cur = cur.next
+        self.storage = new_array
 
 
 if __name__ == "__main__":
@@ -236,8 +257,8 @@ if __name__ == "__main__":
     print("item count is: ", ht.item_count)
 
     # Test deletion
-    for i in range(13, 0, -1):
-        ht.delete(f"line_{i}")
+    # for i in range(13, 0, -1):
+    #     ht.delete(f"line_{i}")
 
     # Test resizing
     old_capacity = ht.get_num_slots()
@@ -247,7 +268,7 @@ if __name__ == "__main__":
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
-    for i in range(1, 13):
+    for i in range(1, len(ht.storage)+1):
         print(ht.get(f"line_{i}"))
 
     print("item count is: ", ht.item_count)
