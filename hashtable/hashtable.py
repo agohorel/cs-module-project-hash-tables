@@ -8,6 +8,14 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
+    def __repr__(self):
+        return f'HashTableEntry({repr(self.key)},{repr(self.value)})'
+
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -23,8 +31,11 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = capacity
-        self.storage = [None] * capacity
+        self.storage = [LinkedList()] * capacity
         self.item_count = 0
+
+    def __repr__(self):
+        return f"{self.storage}"
 
     def get_num_slots(self):
         """
@@ -61,6 +72,7 @@ class HashTable:
         for byte in key.encode():
             hashed *= fnv_prime
             hashed ^= byte
+            hashed &= 0xffffffffffffffff
 
         return hashed
 
@@ -79,6 +91,7 @@ class HashTable:
         for byte in key.encode():
             hashed ^= byte
             hashed *= fnv_prime
+            hashed &= 0xffffffffffffffff
 
         return hashed
 
@@ -96,7 +109,8 @@ class HashTable:
 
         for byte in key.encode():
             hashed = ((hashed << 5) + hashed) + byte
-            # this is an optimized version of: hashed = hashed * 33 + byte
+            # this ^^^ is an optimized version of: hashed = hashed * 33 + byte
+            hashed &= 0xffffffff
 
         return hashed
 
@@ -118,9 +132,27 @@ class HashTable:
 
         Implement this.
         """
+        # find the hash index
         index = self.hash_index(key)
-        self.storage[index] = HashTableEntry(key, value)
-        self.item_count += 1
+
+        # if LL is empty
+        if self.storage[index].head == None:
+            self.storage[index].head = HashTableEntry(key, value)
+            self.item_count += 1
+            return
+
+        else:
+            cur = self.storage[index].head
+            # search the list for the key
+            while cur.next:
+                # if it's there, replace it's value
+                if cur.key == key:
+                    cur.value = value
+                cur = cur.next
+
+            # otherwise add a new node to the list
+            cur.next = HashTableEntry(key, value)
+            self.item_count += 1
 
     def delete(self, key):
         """
@@ -130,13 +162,22 @@ class HashTable:
 
         Implement this.
         """
-        index = self.hash_index(key)
 
-        if self.storage[index] == None:
-            print("Value not found in hash table")
-        else:
-            self.storage[index] = None
+        index = self.hash_index(key)
+        cur = self.storage[index].head
+
+        if cur.key == key:
+            self.storage[index].head = self.storage[index].head.next
             self.item_count -= 1
+            return
+
+        while cur.next:
+            prev = cur
+            cur = cur.next
+            if cur.key == key:
+                prev.next = cur.next
+                self.item_count -= 1
+                return None
 
     def get(self, key):
         """
@@ -146,12 +187,21 @@ class HashTable:
 
         Implement this.
         """
-        index = self.hash_index(key)
 
-        if self.storage[index] == None:
+        index = self.hash_index(key)
+        cur = self.storage[index].head
+
+        if cur == None:
             return None
-        else: 
-            return self.storage[index].value
+
+        if cur.key == key:
+            return cur.value
+
+        while cur.next:
+            cur = cur.next
+            if cur.key == key:
+                return cur.value
+        return None
 
     def resize(self, new_capacity):
         """
@@ -183,6 +233,11 @@ if __name__ == "__main__":
     # Test storing beyond capacity
     for i in range(1, 13):
         print(ht.get(f"line_{i}"))
+    print("item count is: ", ht.item_count)
+
+    # Test deletion
+    for i in range(13, 0, -1):
+        ht.delete(f"line_{i}")
 
     # Test resizing
     old_capacity = ht.get_num_slots()
@@ -194,5 +249,7 @@ if __name__ == "__main__":
     # Test if data intact after resizing
     for i in range(1, 13):
         print(ht.get(f"line_{i}"))
+
+    print("item count is: ", ht.item_count)
 
     print("")
