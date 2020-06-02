@@ -101,7 +101,7 @@ class HashTable:
 
         Implement this, and/or FNV-1.
 
-        Some insight into the magic numbers 5381 and 33: 
+        Some insight into the magic numbers 5381 and 33:
         https://stackoverflow.com/questions/1579721/why-are-5381-and-33-so-important-in-the-djb2-algorithm
         """
 
@@ -132,6 +132,11 @@ class HashTable:
 
         Implement this.
         """
+        # comment this resizing block out to pass tests - they will manually resize
+        # if self.get_load_factor() > 0.7:
+        #     print(f"\nresizing from {self.capacity} to {self.capacity * 2}\n")
+        #     self.resize(self.capacity * 2)
+
         # find the hash index
         index = self.hash_index(key)
 
@@ -162,6 +167,11 @@ class HashTable:
 
         Implement this.
         """
+        # comment this resizing block out to pass tests - they will manually resize
+        # if self.get_load_factor() < 0.2:
+        #     print(f"\nresizing from {self.capacity} to {self.capacity // 2}\n")
+        #     if self.capacity / 2 >= 8:
+        #         self.resize(self.capacity // 2)
 
         index = self.hash_index(key)
         cur = self.storage[index].head
@@ -257,15 +267,17 @@ if __name__ == "__main__":
     print("item count is: ", ht.item_count)
 
     # Test deletion
-    # for i in range(13, 0, -1):
-    #     ht.delete(f"line_{i}")
+    print("")
+    for i in range(1, ht.item_count+1):
+        print(f"line_{i}")
+        ht.delete(f"line_{i}")
 
     # Test resizing
-    old_capacity = ht.get_num_slots()
-    ht.resize(ht.capacity * 2)
-    new_capacity = ht.get_num_slots()
+    # old_capacity = ht.get_num_slots()
+    # ht.resize(ht.capacity * 2)
+    # new_capacity = ht.get_num_slots()
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
     for i in range(1, len(ht.storage)+1):
