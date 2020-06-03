@@ -1,5 +1,17 @@
 def no_dups(s):
-    # Your code here
+    counts = {}
+    str = ""
+
+    for word in s.split(" "):
+        if word not in counts and word != "":
+            counts[word] = 1
+        elif word != "":
+            counts[word] += 1
+
+    for word in counts:
+        str += f"{word} "
+
+    return str.strip()
 
 
 
