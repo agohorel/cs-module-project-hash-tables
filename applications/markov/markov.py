@@ -18,26 +18,27 @@ for idx, word in enumerate(words):
 
 
 def make_sentence():
-    start = get_starting_word()
-    sentence = start
-    nxt = start
-    last = words[-1]
+    try:
+        start = get_starting_word()
+        sentence = start
+        nxt = start
+        last = words[-1]
 
-    # @TODO account for closing quotes followed by punctuation
-    while nxt[-1] != "." or nxt[-1] != "?" or nxt[-1] != "!":
-        if nxt == last:
-            break
+        while nxt[-1] != "." or nxt[-1] != "?" or nxt[-1] != "!":
+            if nxt == last:
+                break
 
-        nxt = markov[nxt]
-        sentence += f" {nxt}"
+            nxt = markov[nxt]
+            sentence += f" {nxt}"
 
-        if sentence[-1] == "." or sentence[-1] == "?" or sentence[-1] == "!":
-            break
+            if sentence[-1] == "." or sentence[-1] == "?" or sentence[-1] == "!":
+                break
 
-    return sentence
+        return sentence
+    except: 
+        pass
 
 
-# @TODO check char after open quote to make sure it's a capital
 def get_starting_word():
     word = " "
     while word != "" and word[0] != '"' and word[0].isupper() == False:
@@ -46,6 +47,6 @@ def get_starting_word():
     return word
 
 
-for i in range(5):
+for i in range(100):
     print("")
     print(make_sentence())
